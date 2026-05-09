@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Spider body -->
+  <ellipse cx="60" cy="65" rx="22" ry="18" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+  <!-- Head -->
+  <circle cx="60" cy="42" r="14" fill="#1e293b" stroke="#475569" stroke-width="1.5"/>
+  <!-- Eyes - wider open -->
+  <circle cx="54" cy="38" r="4.5" fill="#22c55e"/>
+  <circle cx="66" cy="38" r="4.5" fill="#22c55e"/>
+  <circle cx="55.5" cy="37" r="2" fill="white"/>
+  <circle cx="67.5" cy="37" r="2" fill="white"/>
+  <!-- Left legs - animated up -->
+  <path d="M40,55 Q22,35 10,28" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M38,62 Q16,55 5,48" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M38,70 Q16,80 6,88" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M40,78 Q24,92 16,102" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Right legs - animated down -->
+  <path d="M80,55 Q98,45 110,38" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M82,62 Q104,65 114,60" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M82,70 Q104,72 114,78" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <path d="M80,78 Q96,84 104,92" stroke="#475569" stroke-width="2" fill="none" stroke-linecap="round"/>
+  <!-- Excited mouth -->
+  <ellipse cx="60" cy="47" rx="4" ry="2" fill="#0f172a"/>
+</svg>

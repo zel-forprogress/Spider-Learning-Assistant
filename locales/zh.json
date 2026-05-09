@@ -1,0 +1,43 @@
+{
+    "app_name": "蜘蛛学习助手",
+    "app_subtitle": "AI 驱动的学习伴侣",
+
+    "settings": "设置",
+    "save": "保存",
+    "cancel": "取消",
+
+    "tab_ai": "AI 提供商",
+    "tab_capture": "内容获取",
+    "tab_general": "通用",
+
+    "provider": "AI 提供商",
+    "api_key": "API 密钥",
+    "api_key_placeholder": "输入 API 密钥...",
+    "model": "模型",
+
+    "capture_mode": "内容获取",
+    "capture_mode_info": "UI 自动化模式\n自动读取浏览器可见文本，无需任何配置。\n支持所有浏览器。",
+    "auto_capture": "内容变化时自动捕获",
+
+    "window_opacity": "窗口透明度",
+    "start_collapsed": "启动时最小化",
+
+    "show_window": "显示窗口",
+    "quit": "退出",
+
+    "no_page": "未检测到页面",
+    "browsing": "正在浏览: {title}",
+
+    "ask_placeholder": "关于当前页面提问...",
+    "send": "发送",
+    "thinking": "蜘蛛正在思考",
+    "error_prefix": "错误: {message}",
+
+    "spider_idle": "空闲",
+    "spider_crawling": "正在爬取",
+    "spider_thinking": "正在思考",
+    "spider_happy": "已完成",
+
+    "no_provider": "未配置 AI 提供商。请在设置中配置。",
+    "still_processing": "正在处理上一个问题..."
+}

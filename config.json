@@ -1,0 +1,45 @@
+{
+    "ai": {
+        "provider": "openai",
+        "model": "gpt-4o",
+        "max_tokens": 2048,
+        "temperature": 0.7
+    },
+    "browser": {
+        "poll_interval": 2.0,
+        "max_content_tokens": 8000,
+        "auto_crawl": true
+    },
+    "ui": {
+        "window_x": 100,
+        "window_y": 100,
+        "window_width": 380,
+        "window_height": 520,
+        "collapsed_width": 120,
+        "collapsed_height": 140,
+        "opacity": 0.92,
+        "start_collapsed": false
+    },
+    "history": {
+        "max_pages": 10,
+        "max_conversations": 50,
+        "persist_to_disk": true
+    },
+    "providers": {
+        "openai": {
+            "api_key": "",
+            "default_model": "gpt-4o",
+            "available_models": ["gpt-4o", "gpt-4o-mini", "gpt-4-turbo"]
+        },
+        "claude": {
+            "api_key": "",
+            "default_model": "claude-sonnet-4-20250514",
+            "available_models": ["claude-sonnet-4-20250514", "claude-haiku-4-20250414"]
+        },
+        "ollama": {
+            "base_url": "http://localhost:11434",
+            "default_model": "llama3.2",
+            "available_models": []
+        }
+    }
+}
