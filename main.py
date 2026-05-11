@@ -1,8 +1,12 @@
 import sys
 import logging
+from pathlib import Path
 
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
+from PyQt6.QtGui import QIcon
+
+ASSETS_DIR = Path(__file__).parent / "assets"
 
 from core.config import load_config, save_config
 from core.i18n import set_language
@@ -27,6 +31,10 @@ class SpiderApp:
     def __init__(self):
         self._app = QApplication(sys.argv)
         self._app.setQuitOnLastWindowClosed(False)
+
+        icon_path = ASSETS_DIR / "spider_icon.ico"
+        if icon_path.exists():
+            self._app.setWindowIcon(QIcon(str(icon_path)))
 
         self._config = load_config()
         set_language(self._config.ui.language)
