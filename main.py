@@ -11,6 +11,8 @@ from core.content_structurer import ContentStructurer
 from browser.uia_extractor import UIAExtractor
 from ai.manager import AIManager
 from ui.main_window import MainWindow
+from ui.chat_window import ChatWindow
+from ui.utility_window import UtilityWindow
 from ui.tray_icon import TrayIcon
 from ui.settings_dialog import SettingsDialog
 
@@ -28,7 +30,10 @@ class SpiderApp:
 
         self._config = load_config()
         set_language(self._config.ui.language)
+
         self._window = MainWindow(self._config)
+        self._chat_win = ChatWindow(self._config)
+        self._utility_win = UtilityWindow(self._config)
         self._tray = TrayIcon(self._window, self._config)
 
         self._structurer = ContentStructurer()
@@ -48,7 +53,6 @@ class SpiderApp:
         self._start_monitoring()
 
     def run(self):
-        """启动应用"""
         self._tray.show()
         self._window.show()
         exit_code = self._app.exec()
@@ -62,32 +66,52 @@ class SpiderApp:
             self._ai_manager.set_provider(self._config.ai, provider_cfg)
 
     def _connect_signals(self):
-        self._window.settings_clicked.connect(self._on_settings)
-        self._window.message_submitted.connect(self._on_user_message)
+        # Pet window clicks
+        self._window.left_clicked.connect(self._toggle_chat)
+        self._window.right_clicked.connect(self._toggle_utility)
+
+        # Chat window
+        self._chat_win.message_submitted.connect(self._on_user_message)
+
+        # Utility window
+        self._utility_win.settings_requested.connect(self._on_settings)
+
+        # Tray
         self._tray.settings_requested.connect(self._on_settings)
         self._tray.quit_requested.connect(self._on_quit)
 
+        # AI manager
         self._ai_manager.response_chunk.connect(self._on_ai_chunk)
         self._ai_manager.response_complete.connect(self._on_ai_complete)
         self._ai_manager.error.connect(self._on_ai_error)
 
-    def _start_monitoring(self):
-        """启动 UIA 监控"""
-        import time
-        from PyQt6.QtCore import QTimer
+    def _toggle_chat(self):
+        if self._chat_win.isVisible():
+            self._chat_win.hide()
+        else:
+            self._chat_win.show()
+            self._chat_win.raise_()
+            self._chat_win.activateWindow()
 
+    def _toggle_utility(self):
+        if self._utility_win.isVisible():
+            self._utility_win.hide()
+        else:
+            self._utility_win.show()
+            self._utility_win.raise_()
+            self._utility_win.activateWindow()
+
+    def _start_monitoring(self):
+        from PyQt6.QtCore import QTimer
         self._monitor_timer = QTimer()
         self._monitor_timer.timeout.connect(self._poll_content)
         self._monitor_timer.start(int(self._config.browser.poll_interval * 1000))
 
     def _poll_content(self):
-        """轮询前台窗口内容"""
         if not self._config.browser.auto_crawl:
             return
-
         try:
             title, content = self._uia_extractor.extract_text_from_browser()
-
             if content and content != self._last_content:
                 self._last_content = content
                 self._on_page_changed(title, content)
@@ -95,12 +119,10 @@ class SpiderApp:
             logger.error(f"Content poll error: {e}")
 
     def _on_page_changed(self, title: str, content: str):
-        """页面内容变化"""
         self._window.set_spider_state("crawling")
         self._tray.update_page_title(title)
 
         try:
-            # 构造简单 HTML 以便结构化处理
             html = (
                 f"<html><head><title>{title}</title></head>"
                 f"<body><pre>{content}</pre></body></html>"
@@ -114,7 +136,8 @@ class SpiderApp:
             self._history.add_page(page)
 
             display_title = title or "Unknown Page"
-            self._window.show_page_indicator(display_title[:60])
+            self._chat_win.show_page_indicator(display_title[:60])
+            self._utility_win.add_page(display_title[:80])
             self._window.set_spider_state("happy")
         except Exception as e:
             logger.error(f"Content processing error: {e}")
@@ -122,9 +145,9 @@ class SpiderApp:
 
     def _on_user_message(self, text: str):
         self._last_user_message = text
-        self._window.add_user_message(text)
+        self._chat_win.add_user_message(text)
         self._window.set_spider_state("thinking")
-        self._window.show_typing_indicator()
+        self._chat_win.show_typing_indicator()
 
         context = self._history.get_current_page()
         history_summary = self._history.get_history_summary()
@@ -132,20 +155,20 @@ class SpiderApp:
 
     def _on_ai_chunk(self, chunk: str):
         if not self._streaming_started:
-            self._window.hide_typing_indicator()
-            self._window.start_ai_streaming()
+            self._chat_win.hide_typing_indicator()
+            self._chat_win.start_ai_streaming()
             self._streaming_started = True
-        self._window.append_ai_chunk(chunk)
+        self._chat_win.append_ai_chunk(chunk)
 
     def _on_ai_complete(self, full_response: str):
-        self._window.finish_ai_streaming()
+        self._chat_win.finish_ai_streaming()
         self._window.set_spider_state("happy")
         self._history.add_conversation(self._last_user_message, full_response)
         self._streaming_started = False
 
     def _on_ai_error(self, msg: str):
-        self._window.hide_typing_indicator()
-        self._window.add_error_message(msg)
+        self._chat_win.hide_typing_indicator()
+        self._chat_win.add_error_message(msg)
         self._window.set_spider_state("idle")
         self._streaming_started = False
 
@@ -158,9 +181,8 @@ class SpiderApp:
         self._init_ai_provider()
         self._window.setWindowOpacity(self._config.ui.opacity)
         self._monitor_timer.setInterval(int(self._config.browser.poll_interval * 1000))
-        # 更新翻译
         self._tray.retranslate()
-        self._window.retranslate()
+        self._chat_win.retranslate()
 
     def _on_quit(self):
         save_config(self._config)

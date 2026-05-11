@@ -27,6 +27,7 @@
 
     "no_page": "未检测到页面",
     "browsing": "正在浏览: {title}",
+    "browsing_history": "浏览历史",
 
     "ask_placeholder": "关于当前页面提问...",
     "send": "发送",
