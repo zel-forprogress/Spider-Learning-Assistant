@@ -18,9 +18,7 @@ class TrayIcon(QSystemTrayIcon):
         self._window = window
         self._config = config
 
-        icon_path = ASSETS_DIR / "tray_icon.png"
-        if not icon_path.exists():
-            icon_path = ASSETS_DIR / "tray_icon.svg"
+        icon_path = ASSETS_DIR / "tray_icon.svg"
         if icon_path.exists():
             self.setIcon(QIcon(str(icon_path)))
         else:

@@ -112,7 +112,7 @@ class MainWindow(QWidget):
     def mouseReleaseEvent(self, event: QMouseEvent):
         if self._drag_pos is not None and not self._is_dragging:
             if self._click_button == Qt.MouseButton.LeftButton:
-                self._spider.play_interaction()
+                self.left_clicked.emit()
             elif self._click_button == Qt.MouseButton.RightButton:
                 self._show_context_menu(event.position().toPoint())
 
