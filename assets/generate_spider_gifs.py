@@ -2,7 +2,8 @@
 Generate animated GIF spider states from source image.
 
 Run: python assets/generate_spider_gifs.py
-Produces: spider_idle.gif, spider_crawling.gif, spider_thinking.gif, spider_happy.gif
+Produces: spider_idle.gif, spider_crawling.gif, spider_thinking.gif, spider_happy.gif,
+          spider_wave.gif, spider_jump.gif, spider_spin.gif, spider_nod.gif
 """
 
 import math
@@ -230,6 +231,138 @@ def main():
     make_crawling_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_crawling.gif")
     make_thinking_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_thinking.gif")
     make_happy_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_happy.gif")
+
+def make_wave_gif(base_img, size, out_path):
+    """Wave: tilt left-right like greeting."""
+    frames = []
+    n = 16
+    for i in range(n):
+        t = i / n
+        # Tilt angle: -15 to +15 degrees
+        angle = 15 * math.sin(t * 2 * math.pi)
+        rotated = base_img.rotate(angle, resample=Image.Resampling.BICUBIC, expand=False)
+        canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        w, h = rotated.size
+        x = (size - w) // 2
+        y = (size - h) // 2
+        canvas.paste(rotated, (x, y), rotated)
+        frames.append(canvas)
+
+    frames[0].save(
+        out_path, save_all=True, append_images=frames[1:],
+        duration=60, loop=0, disposal=2, transparency=0,
+    )
+    print(f"  -> {out_path} ({n} frames)")
+
+
+def make_jump_gif(base_img, size, out_path):
+    """Jump: bounce up high with squash-stretch."""
+    frames = []
+    n = 16
+    for i in range(n):
+        t = i / n
+        # Jump arc: up then down
+        bounce = int(20 * math.sin(t * math.pi))
+        sy = 1.0 + 0.08 * math.sin(t * math.pi)
+        sx = 1.0 - 0.05 * math.sin(t * math.pi)
+        w, h = base_img.size
+        new_w, new_h = int(w * sx), int(h * sy)
+        scaled = base_img.resize((new_w, new_h), Image.Resampling.LANCZOS)
+        canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        x = (size - new_w) // 2
+        y = (size - new_h) // 2 - bounce
+        canvas.paste(scaled, (x, y), scaled)
+
+        # Impact lines at peak
+        if 6 <= i <= 10:
+            draw = ImageDraw.Draw(canvas)
+            cx, cy = size // 2, size // 2 + 10
+            for angle_deg in [0, 45, 90, 135]:
+                rad = math.radians(angle_deg)
+                r1, r2 = 45, 55
+                draw.line(
+                    [(cx + r1 * math.cos(rad), cy + r1 * math.sin(rad)),
+                     (cx + r2 * math.cos(rad), cy + r2 * math.sin(rad))],
+                    fill=(200, 200, 200, 150), width=2
+                )
+
+        frames.append(canvas)
+
+    frames[0].save(
+        out_path, save_all=True, append_images=frames[1:],
+        duration=60, loop=0, disposal=2, transparency=0,
+    )
+    print(f"  -> {out_path} ({n} frames)")
+
+
+def make_spin_gif(base_img, size, out_path):
+    """Spin: rotate 360 degrees."""
+    frames = []
+    n = 20
+    for i in range(n):
+        angle = 360 * (i / n)
+        rotated = base_img.rotate(-angle, resample=Image.Resampling.BICUBIC, expand=False)
+        canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        w, h = rotated.size
+        x = (size - w) // 2
+        y = (size - h) // 2
+        canvas.paste(rotated, (x, y), rotated)
+        frames.append(canvas)
+
+    frames[0].save(
+        out_path, save_all=True, append_images=frames[1:],
+        duration=50, loop=0, disposal=2, transparency=0,
+    )
+    print(f"  -> {out_path} ({n} frames)")
+
+
+def make_nod_gif(base_img, size, out_path):
+    """Nod: tilt down then back up."""
+    frames = []
+    n = 12
+    for i in range(n):
+        t = i / n
+        # Nod: 0 -> -12 -> 0
+        angle = -12 * math.sin(t * math.pi)
+        # Slight forward lean
+        dy = int(3 * math.sin(t * math.pi))
+        rotated = base_img.rotate(angle, resample=Image.Resampling.BICUBIC, expand=False)
+        canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+        w, h = rotated.size
+        x = (size - w) // 2
+        y = (size - h) // 2 + dy
+        canvas.paste(rotated, (x, y), rotated)
+        frames.append(canvas)
+
+    frames[0].save(
+        out_path, save_all=True, append_images=frames[1:],
+        duration=80, loop=0, disposal=2, transparency=0,
+    )
+    print(f"  -> {out_path} ({n} frames)")
+
+
+def main():
+    print("Loading source image...")
+    src = Image.open(SOURCE)
+    src = remove_background(src)
+    src = crop_to_content(src)
+    base = fit_to_size(src, TARGET_SIZE)
+
+    # Save transparent base for reference
+    base.save(ASSETS_DIR / "spider_base.png")
+    print(f"  -> spider_base.png (transparent base, {base.size})")
+
+    print("Generating state GIFs...")
+    make_idle_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_idle.gif")
+    make_crawling_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_crawling.gif")
+    make_thinking_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_thinking.gif")
+    make_happy_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_happy.gif")
+
+    print("Generating interaction GIFs...")
+    make_wave_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_wave.gif")
+    make_jump_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_jump.gif")
+    make_spin_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_spin.gif")
+    make_nod_gif(base, TARGET_SIZE, ASSETS_DIR / "spider_nod.gif")
 
     print("Done!")
 

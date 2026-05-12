@@ -74,9 +74,10 @@ class SpiderApp:
             self._ai_manager.set_provider(self._config.ai, provider_cfg)
 
     def _connect_signals(self):
-        # Pet window clicks
-        self._window.left_clicked.connect(self._toggle_chat)
-        self._window.right_clicked.connect(self._toggle_utility)
+        # Pet window: left click plays animation, right click shows menu
+        self._window.chat_requested.connect(self._toggle_chat)
+        self._window.settings_requested.connect(self._on_settings)
+        self._window.quit_requested.connect(self._on_quit)
 
         # Chat window
         self._chat_win.message_submitted.connect(self._on_user_message)
